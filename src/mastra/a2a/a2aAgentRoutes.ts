@@ -27,7 +27,10 @@ export const a2aAgentRoute = registerApiRoute("/a2a/agent/:agentId", {
       const agentId = c.req.param("agentId");
 
       const body = await c.req.json();
-      const { jsonrpc, id: requestId, method, params } = body;
+
+      // --- CORRECTION APPLIED HERE ---
+      // Ensure jsonrpc and id are correctly extracted and present for JSON-RPC 2.0 validation
+      const { jsonrpc, id: requestId, params } = body;
 
       if (jsonrpc !== "2.0" || !requestId) {
         return c.json(
@@ -43,6 +46,7 @@ export const a2aAgentRoute = registerApiRoute("/a2a/agent/:agentId", {
           400
         );
       }
+      // --- END CORRECTION ---
 
       const agent = mastra.getAgent(agentId);
       if (!agent) {
@@ -100,7 +104,7 @@ export const a2aAgentRoute = registerApiRoute("/a2a/agent/:agentId", {
       }
 
       const history = [
-        ...messagesList.map((msg) => ({
+        ...messagesList.map((msg: any) => ({
           kind: "message",
           role: msg.role,
           parts: msg.parts,
